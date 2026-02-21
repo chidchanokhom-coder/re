@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Untitled</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Escape Room - Hardcore Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap');
+
+        /* ================= ธีมแสงสีนีออนสุดอลังการ ================= */
+        body {
+            margin: 0; padding: 0;
+            background: linear-gradient(135deg, #090a0f, #1b2735, #090a0f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Sarabun', sans-serif;
+            color: #fff;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            height: 100vh;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* หน้าปก */
+        #cover-screen {
+            position: absolute; z-index: 100;
+            background: rgba(9, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            width: 100vw; height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center;
+        }
+
+        h1 { 
+            font-size: 4.5rem; color: #fff; 
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 40px #00ffff; 
+            margin-bottom: 5px; letter-spacing: 2px;
+        }
+        
+        .subtitle { 
+            font-size: 1.5rem; color: #ff00ff; 
+            text-shadow: 0 0 10px #ff00ff; margin-bottom: 30px; font-weight: bold; 
+        }
+
+        .instructions { 
+            background: rgba(0, 0, 0, 0.6); padding: 25px; 
+            border-radius: 15px; border: 2px solid #00ffff; 
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) inset;
+            text-align: left; max-width: 90%; width: 550px; 
+            line-height: 1.6; font-size: 1.1rem;
+        }
+
+        .btn { 
+            margin-top: 30px; padding: 15px 50px; 
+            font-size: 1.5rem; font-weight: bold; 
+            color: #fff; background: transparent; 
+            border: 3px solid #00ffff; border-radius: 8px; 
+            cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 0 15px #00ffff inset, 0 0 15px #00ffff;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover { 
+            background: #00ffff; color: #000; 
+            box-shadow: 0 0 30px #00ffff inset, 0 0 30px #00ffff; 
+            transform: scale(1.1); 
+        }
+
+        /* ตัวเกม */
+        #game-wrapper {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; max-width: 800px;
+        }
+
+        #game-screen {
+            display: none; position: relative;
+            width: 800px; height: 600px;
+            background-color: rgba(10, 15, 30, 0.8);
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            border: 4px solid #00ffff;
+            box-shadow: 0 0 20px #00ffff, inset 0 0 30px rgba(0, 255, 255, 0.2);
+            border-radius: 10px; transform-origin: top center; overflow: hidden;
+        }
+
+        #ui-bar {
+            position: absolute; top: 0; left: 0; width: 100%; padding: 12px;
+            background: rgba(0, 20, 40, 0.9); border-bottom: 2px solid #00ffff;
+            box-sizing: border-box; display: flex;
+            justify-content: space-between; font-size: 1.2rem; font-weight: bold; z-index: 5;
+            text-shadow: 0 0 5px #fff;
+        }
+
+        /* เอฟเฟกต์ตัวละคร */
+        #player { 
+            position: absolute; width: 30px; height: 30px; 
+            background-color: #fff; border-radius: 50%; 
+            box-shadow: 0 0 15px #00ffff, 0 0 30px #00ffff;
+            z-index: 4; transition: transform 0.1s;
+        }
+        
+        /* เอฟเฟกต์ประตู */
+        #door { 
+            position: absolute; width: 100px; height: 30px; top: 50px; left: 350px; 
+            display: flex; justify-content: center; align-items: center; 
+            color: #fff; font-weight: bold; font-size: 1rem; z-index: 3; 
+            border-radius: 5px; letter-spacing: 2px;
+            background: rgba(100, 100, 100, 0.8); border: 2px solid #aaa;
+            box-shadow: 0 0 10px #aaa; transition: all 0.5s;
+        }
+
+        .door-open {
+            background: rgba(0, 255, 170, 0.8) !important; border-color: #00ffaa !important;
+            box-shadow: 0 0 30px #00ffaa, 0 0 50px #00ffaa inset !important;
+        }
+        
+        /* กุญแจ */
+        #key { 
+            position: absolute; font-size: 35px; z-index: 3; 
+            filter: drop-shadow(0 0 10px #ffd700);
+            animation: float 2s ease-in-out infinite; 
+        }
+        
+        /* กำแพงนิ่ง (สีชมพู) */
+        .obstacle { 
+            position: absolute; background: rgba(255, 0, 255, 0.15); 
+            border: 2px solid #ff00ff; box-shadow: 0 0 15px #ff00ff, inset 0 0 10px #ff00ff;
+            border-radius: 5px; z-index: 2; box-sizing: border-box;
+        }
+
+        /* เลเซอร์เคลื่อนที่มรณะ (สีแดง) ชน = ตาย */
+        .laser-death {
+            position: absolute; background: rgba(255, 0, 0, 0.6); 
+            border: 2px solid #ff0000; box-shadow: 0 0 20px #ff0000, inset 0 0 15px #ff0000;
+            border-radius: 10px; z-index: 3; box-sizing: border-box;
+        }
+
+        @keyframes float { 
+            0% { transform: translateY(0) scale(1); } 
+            50% { transform: translateY(-15px) scale(1.1); } 
+            100% { transform: translateY(0) scale(1); } 
+        }
+
+        /* หน้าต่างคำถาม */
+        #question-modal { 
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
+            z-index: 20; justify-content: center; align-items: center; flex-direction: column; 
+        }
+        .question-box { 
+            background: rgba(10, 20, 30, 0.95); color: #fff; padding: 40px; 
+            border-radius: 15px; width: 85%; max-width: 650px; text-align: center; 
+            border: 2px solid #00ffff; box-shadow: 0 0 40px rgba(0, 255, 255, 0.4);
+        }
+        .question-text { font-size: 1.5rem; margin-bottom: 25px; font-weight: bold; text-shadow: 0 0 5px #fff; }
+        .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .choice-btn { 
+            padding: 15px; font-size: 1.2rem; background: transparent; color: #fff; 
+            border: 2px solid #ff00ff; border-radius: 8px; cursor: pointer; font-family: 'Sarabun'; 
+            transition: all 0.2s; box-shadow: 0 0 10px rgba(255, 0, 255, 0.3) inset;
+        }
+        .choice-btn:hover { background: #ff00ff; color: #fff; box-shadow: 0 0 20px #ff00ff; transform: scale(1.02); }
+
+        /* ปุ่มมือถือ */
+        #mobile-controls { display: none; margin-top: 20px; flex-direction: column; align-items: center; }
+        .dpad-row { display: flex; gap: 50px; margin: 10px 0; }
+        .dpad-btn { 
+            width: 70px; height: 70px; background: rgba(0, 255, 255, 0.1); 
+            border-radius: 50%; font-size: 35px; display: flex; justify-content: center; 
+            align-items: center; user-select: none; border: 2px solid #00ffff; color: #00ffff; 
+            box-shadow: 0 0 15px rgba(0,255,255,0.4);
+        }
+        .dpad-btn:active { background: rgba(0, 255, 255, 0.5); box-shadow: 0 0 30px #00ffff; }
+
+        @media (max-width: 850px) { #mobile-controls { display: flex; } }
+    </style>
+</head>
+<body>
+
+    <div id="cover-screen">
+        <h1>CYBER MATH</h1>
+        <div class="subtitle">HARDCORE NEON LABYRINTH</div>
+        <div class="instructions">
+            <strong>ภารกิจและกติกาใหม่:</strong><br>
+            1. ควบคุมตัวละครหลบ <strong>กำแพงนีออน (สีชมพู)</strong> เพื่อหากุญแจ<br>
+            2. ⚠️ <strong>เลเซอร์สีแดง (มรณะ):</strong> มันขยับได้! หากเดินชน คุณจะตายทันที!<br>
+            3. ชนกุญแจ 🔑 เพื่อเปิดคำถามคณิตศาสตร์<br>
+            4. <strong>ตอบถูก:</strong> ประตูเปิด / <strong>ตอบผิด:</strong> ตาย กลับด่าน 1!<br>
+            5. เปิดลำโพงด้วยนะ มีระบบเสียงใหม่เต็มรูปแบบ!
+        </div>
+        <button class="btn" onclick="initGame()">ENTER MATRIX</button>
+    </div>
+
+    <div id="game-wrapper">
+        <div id="game-screen">
+            <div id="ui-bar">
+                <span id="level-display" style="color: #00ffff;">LEVEL: 1/10</span>
+                <span id="topic-display" style="color: #ff00ff;">KEY: ❌ MISSING</span>
+            </div>
+            <div id="door">LOCKED</div>
+            <div id="key">🔑</div>
+            <div id="player"></div>
+            <div id="obstacles-container"></div>
+            
+            <div id="question-modal">
+                <div class="question-box">
+                    <div class="question-text" id="q-text">คำถาม</div>
+                    <div class="choices" id="choices-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-controls">
+            <div class="dpad-btn" id="btn-up" ontouchstart="keys.ArrowUp=true" ontouchend="keys.ArrowUp=false" onmousedown="keys.ArrowUp=true" onmouseup="keys.ArrowUp=false">⬆️</div>
+            <div class="dpad-row">
+                <div class="dpad-btn" id="btn-left" ontouchstart="keys.ArrowLeft=true" ontouchend="keys.ArrowLeft=false" onmousedown="keys.ArrowLeft=true" onmouseup="keys.ArrowLeft=false">⬅️</div>
+                <div class="dpad-btn" id="btn-right" ontouchstart="keys.ArrowRight=true" ontouchend="keys.ArrowRight=false" onmousedown="keys.ArrowRight=true" onmouseup="keys.ArrowRight=false">➡️</div>
+            </div>
+            <div class="dpad-btn" id="btn-down" ontouchstart="keys.ArrowDown=true" ontouchend="keys.ArrowDown=false" onmousedown="keys.ArrowDown=true" onmouseup="keys.ArrowDown=false">⬇️</div>
+        </div>
+    </div>
+
+    <script>
+        // ================= ระบบเสียง (Web Audio API) =================
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'key') {
+                // เสียงเก็บกุญแจ (วิ้งงงง)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1600, now + 0.1);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'correct') {
+                // เสียงตอบถูก (ตี๊ด ติ๊ด ติ๊ง!)
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(880, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'portal') {
+                // เสียงเข้าประตู (วู้บบบบ)
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.4);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'wrong' || type === 'death') {
+                // เสียงตาย/ตอบผิด (ตื๊ดดดดดด ลงต่ำ)
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
+            }
+        }
+
+        // ================= ข้อมูลเกม =================
+        const levels = [
+            { q: "กำหนด A = {1, 2, 3}, B = {2, 3, 4} ข้อใดคือ A ∪ B", c: ["{2, 3}", "{1, 2, 3, 4}", "{1, 4}", "∅"], a: 1 },
+            { q: "ประพจน์ใดมีค่าความจริงเป็น เท็จ", c: ["T ∨ F", "F → F", "T ∧ F", "F ↔ F"], a: 2 },
+            { q: "กำหนด A = {1, {1,2}, 3} ข้อใดถูกต้อง", c: ["2 ∈ A", "{1} ∈ A", "{1,2} ⊂ A", "{1,2} ∈ A"], a: 3 },
+            { q: "นิเสธของประพจน์ (p → q) สมมูลกับข้อใด", c: ["p ∧ ~q", "~p ∨ q", "~p ∧ q", "p → ~q"], a: 0 },
+            { q: "นักเรียน 40 คน ชอบคณิต 20 คน, ชอบวิทย์ 15 คน, ชอบทั้งสองวิชา 5 คน มีนักเรียนที่ไม่ชอบวิชาใดเลยกี่คน?", c: ["5 คน", "10 คน", "15 คน", "20 คน"], a: 1 },
+            { q: "ถ้า (p ∧ q) → r มีค่าความจริงเป็นเท็จ แล้ว p, q, r มีค่าความจริงตามลำดับคือ?", c: ["T, T, T", "T, F, F", "T, T, F", "F, T, F"], a: 2 },
+            { q: "กำหนด n(A) = 3 และ n(B) = 4 โดยที่ A ∩ B = ∅ แล้วจำนวนสมาชิกของ P(A ∪ B) คือข้อใด", c: ["12", "64", "128", "256"], a: 2 },
+            { q: "ข้อใดต่อไปนี้เป็นสัจนิรันดร์", c: ["p → (p ∧ q)", "(p ∨ q) → p", "(p ∧ q) → p", "p ↔ ~p"], a: 2 },
+            { q: "กำหนดให้ A, B เป็นเซตใดๆ เซตในข้อใดเท่ากับ (A ∪ B) ∩ B'", c: ["A", "B", "A - B", "B - A"], a: 2 },
+            { q: "กำหนด U = {-1, 0, 1} ประพจน์ใดมีค่าความจริงเป็น จริง?", c: ["∀x [x > 0]", "∃x [x² < 0]", "∀x [x² ≥ 0]", "∃x [x+1 < 0]"], a: 2 }
+        ];
+
+        let currentLevel = 0;
+        let hasKey = false;
+        let gameActive = false;
+        let questionActive = false;
+
+        const player = document.getElementById('player');
+        const door = document.getElementById('door');
+        const keyEl = document.getElementById('key');
+        const obstaclesContainer = document.getElementById('obstacles-container');
+
+        let playerX = 383, playerY = 530;
+        const pSize = 30; // ปรับตัวเล็กลงนิดนึงให้เดินหลบง่ายขึ้น
+        const speed = 4; 
+        
+        let staticObstacles = [];
+        let movingLasers = [];
+
+        let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+        window.addEventListener('keydown', (e) => { if(keys.hasOwnProperty(e.key)) keys[e.key] = true; });
+        window.addEventListener('keyup', (e) => { if(keys.hasOwnProperty(e.key)) keys[e.key] = false; });
+
+        function resizeGame() {
+            const screen = document.getElementById('game-screen');
+            let scale = Math.min(window.innerWidth / 830, (window.innerHeight - 250) / 630);
+            if(scale > 1) scale = 1;
+            screen.style.transform = `scale(${scale})`;
+        }
+        window.addEventListener('resize', resizeGame);
+        resizeGame();
+
+        function initGame() {
+            initAudio();
+            document.getElementById('cover-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            currentLevel = 0;
+            loadLevel();
+            gameActive = true;
+            requestAnimationFrame(gameLoop);
+        }
+
+        function loadLevel() {
+            playerX = 383; playerY = 530;
+            hasKey = false;
+            questionActive = false;
+            
+            player.style.left = playerX + 'px';
+            player.style.top = playerY + 'px';
+            
+            door.classList.remove('door-open');
+            door.innerText = 'LOCKED';
+            
+            keyEl.style.display = 'block';
+            keyEl.style.left = '50px'; keyEl.style.top = '70px';
+            
+            document.getElementById('level-display').innerText = `LEVEL: ${currentLevel + 1} / 10`;
+            document.getElementById('topic-display').innerText = `KEY: ❌ MISSING`;
+            document.getElementById('topic-display').style.color = '#ff00ff';
+
+            generateObstacles();
+        }
+
+        function generateObstacles() {
+            obstaclesContainer.innerHTML = '';
+            staticObstacles = [];
+            movingLasers = [];
+            
+            // ความยาก: กำแพงนิ่งเยอะขึ้นมาก + มีเลเซอร์ขยับได้
+            const numStatic = 15 + (currentLevel * 4); 
+            const numMoving = Math.floor(currentLevel / 2) + 1; // ด่านหลังๆ เลเซอร์วิ่งยิ่งเยอะ
+            
+            let attemptsLimit = 200;
+            
+            // สร้างกำแพงนิ่ง (สีชมพู)
+            for(let i=0; i<numStatic; i++) {
+                let w, h;
+                let type = Math.random();
+                if(type < 0.4) { w = 150 + Math.random()*100; h = 20; } // ยาวขึ้น
+                else if(type < 0.8) { w = 20; h = 150 + Math.random()*100; } // ยาวขึ้น
+                else { w = 60 + Math.random()*30; h = 60 + Math.random()*30; }
+                
+                placeObstacle(w, h, 'static');
+            }
+
+            // สร้างเลเซอร์ขยับได้มรณะ (สีแดง)
+            for(let i=0; i<numMoving; i++) {
+                let isVertical = Math.random() > 0.5;
+                let w = isVertical ? 15 : 120;
+                let h = isVertical ? 120 : 15;
+                placeObstacle(w, h, 'moving', isVertical);
+            }
+        }
+
+        function placeObstacle(w, h, type, isVertical = false) {
+            let x, y;
+            let safe = false;
+            let attempts = 0;
+            
+            while(!safe && attempts < 200) {
+                x = Math.random() * (800 - w);
+                y = 70 + Math.random() * (450 - h);
+                
+                let inStartZone = (x > 320 && x < 480 && y > 450);
+                let inKeyZone = (x < 150 && y < 150);
+                let inDoorZone = (x > 300 && x < 500 && y < 120);
+                
+                if (!inStartZone && !inKeyZone && !inDoorZone) {
+                    safe = true;
+                }
+                attempts++;
+            }
+
+            if(safe) {
+                const div = document.createElement('div');
+                div.style.left = x + 'px';
+                div.style.top = y + 'px';
+                div.style.width = w + 'px';
+                div.style.height = h + 'px';
+                
+                if (type === 'static') {
+                    div.className = 'obstacle';
+                    staticObstacles.push({x, y, w, h});
+                } else {
+                    div.className = 'laser-death';
+                    let speed = 2 + (currentLevel * 0.4); // ยิ่งด่านลึก ยิ่งวิ่งเร็ว
+                    movingLasers.push({
+                        x, y, w, h, startX: x, startY: y, 
+                        moveX: isVertical ? 0 : speed, 
+                        moveY: isVertical ? speed : 0, 
+                        range: 150, dir: 1, el: div
+                    });
+                }
+                obstaclesContainer.appendChild(div);
+            }
+        }
+
+        function gameLoop() {
+            if (gameActive && !questionActive) {
+                // 1. อัปเดตการเดินตัวละคร
+                let nextX = playerX;
+                let nextY = playerY;
+
+                if (keys.ArrowUp) nextY -= speed;
+                if (keys.ArrowDown) nextY += speed;
+                if (keys.ArrowLeft) nextX -= speed;
+                if (keys.ArrowRight) nextX += speed;
+
+                if (nextX < 0) nextX = 0; if (nextX > 800 - pSize) nextX = 800 - pSize;
+                if (nextY < 50) nextY = 50; if (nextY > 600 - pSize) nextY = 600 - pSize;
+
+                // ชนกำแพงนิ่ง = เดินไม่ผ่าน
+                if (!checkCollision(nextX, nextY, pSize, staticObstacles)) {
+                    playerX = nextX; playerY = nextY;
+                    player.style.left = playerX + 'px'; player.style.top = playerY + 'px';
+                }
+
+                // 2. อัปเดตเลเซอร์เคลื่อนที่
+                for (let l of movingLasers) {
+                    l.x += l.moveX * l.dir;
+                    l.y += l.moveY * l.dir;
+                    
+                    if (Math.abs(l.x - l.startX) > l.range || Math.abs(l.y - l.startY) > l.range || 
+                        l.x < 0 || l.x > 800 - l.w || l.y < 50 || l.y > 600 - l.h) {
+                        l.dir *= -1; // วิ่งกลับไปกลับมา
+                    }
+                    l.el.style.left = l.x + 'px'; l.el.style.top = l.y + 'px';
+
+                    // ⚠️ ถ้าชนเลเซอร์แดง = ตาย!
+                    if (checkSingleCollision(playerX, playerY, pSize, l)) {
+                        die("☠️ คุณโดนเลเซอร์มรณะ! ระบบรีเซ็ตกลับด่าน 1 ทันที!");
+                        return; // หยุดลูปเพื่อเริ่มใหม่
+                    }
+                }
+
+                checkInteractions();
+            }
+            if(gameActive) requestAnimationFrame(gameLoop);
+        }
+
+        function checkCollision(x, y, size, obsArray) {
+            let margin = 3; // hitbox เล็กลงนิดหน่อย
+            for(let obs of obsArray) {
+                if (checkSingleCollision(x, y, size, obs, margin)) return true;
+            }
+            return false;
+        }
+
+        function checkSingleCollision(px, py, size, obs, margin = 3) {
+            let pLeft = px + margin; let pRight = px + size - margin;
+            let pTop = py + margin; let pBottom = py + size - margin;
+            return (pLeft < obs.x + obs.w && pRight > obs.x && pTop < obs.y + obs.h && pBottom > obs.y);
+        }
+
+        function checkInteractions() {
+            // ชนกุญแจ
+            if (!hasKey && keyEl.style.display !== 'none') {
+                if (playerX < 50 + 40 && playerX + pSize > 50 && playerY < 70 + 40 && playerY + pSize > 70) {
+                    playSound('key'); // เล่นเสียงชนกุญแจ
+                    questionActive = true;
+                    resetKeys();
+                    setTimeout(showQuestion, 200); // ดีเลย์นิดนึงให้เสียงดังก่อนหน้าต่างขึ้น
+                }
+            }
+
+            // ชนประตู
+            if (playerX < 350 + 100 && playerX + pSize > 350 && playerY < 50 + 30 && playerY + pSize > 50) {
+                if (hasKey) {
+                    playSound('portal'); // เล่นเสียงวาร์ป
+                    currentLevel++;
+                    questionActive = true; // หยุดเกมแปบนึง
+                    resetKeys();
+                    
+                    setTimeout(() => {
+                        if(currentLevel >= levels.length) {
+                            alert("🎉 MISSION ACCOMPLISHED! คุณเทพมาก เคลียร์ Labyrinth มหาโหดนี้ได้!");
+                            location.reload();
+                        } else {
+                            alert("⚡ PORTAL OPENED! ไปลุยด่านต่อไปกันเลย!");
+                            loadLevel();
+                        }
+                    }, 500);
+                } else {
+                    playerY += 15; // เด้งออกถ้ายังไม่มีกุญแจ
+                }
+            }
+        }
+
+        function die(msg) {
+            playSound('death');
+            questionActive = true;
+            resetKeys();
+            setTimeout(() => {
+                alert(msg);
+                currentLevel = 0;
+                loadLevel();
+            }, 300);
+        }
+
+        function resetKeys() {
+            keys.ArrowUp = false; keys.ArrowDown = false; keys.ArrowLeft = false; keys.ArrowRight = false;
+        }
+
+        function showQuestion() {
+            const modal = document.getElementById('question-modal');
+            const data = levels[currentLevel];
+            document.getElementById('q-text').innerText = data.q;
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+
+            data.c.forEach((choice, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerText = choice;
+                btn.onclick = () => answerQuestion(index);
+                container.appendChild(btn);
+            });
+            modal.style.display = 'flex';
+        }
+
+        function answerQuestion(index) {
+            document.getElementById('question-modal').style.display = 'none';
+            if (index === levels[currentLevel].a) {
+                playSound('correct'); // เล่นเสียงตอบถูก
+                alert("✅ ถูกต้อง! วิ่งไปที่ประตูมิติได้เลย แต่อย่าโดนเลเซอร์แดงนะ!");
+                hasKey = true;
+                keyEl.style.display = 'none';
+                
+                door.classList.add('door-open');
+                door.innerText = 'PORTAL OPEN';
+                
+                document.getElementById('topic-display').innerText = `KEY: 🔑 ACQUIRED`;
+                document.getElementById('topic-display').style.color = '#00ffaa';
+                questionActive = false;
+            } else {
+                die("☠️ ตอบผิด!! ระบบทำการสลายร่าง... ส่งคุณกลับไปด่าน 1!");
+            }
+        }
+    </script>
+</body>
+</html>
+    
+  </body>
+  
+</html>
